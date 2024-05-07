@@ -3,7 +3,7 @@
 ## Assumptions & pre-requisites
 
 ### Domain
-In this demo, webservers will be deployed to domain - yaml.work, including
+In this demo, webservers will be deployed to domain - yaml.work, including urls
  - https://mini_car_game.yaml.work, and
  - https://snakegame.yaml.work
 
