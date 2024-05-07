@@ -9,13 +9,13 @@
   vars:
     aws_region: ap-southeast-2
     ami_name_prefix: "RHEL-8.6.0_HVM-"
-    instance_type: t3a.micro
+    instance_type: t3.micro
     volume_size: 32
     my_home_ipv4: 202.7.251.53/32
     infra_group: infra
     webservers:
       - mini_car_game
-      - snakename
+      - snakegame
 
   vars_files:
     - vault.yml
@@ -66,6 +66,7 @@
         tags:
           Name: "{{ this_name }}"
           owner: "{{ owner }}"
+          repo: "{{ repo }}"
       register: ec2sg
 
     - name: get ami id

@@ -10,7 +10,7 @@
         tags:
           Name: "{{ this_name }}"
           owner: "{{ owner }}"
-          #repo: "{{ repo }}"
+          repo: "{{ repo }}"
         tenancy: default
       register: newvpc
 
