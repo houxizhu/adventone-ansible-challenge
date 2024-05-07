@@ -1,1 +1,105 @@
+###
+### This playbook creates 2 aws ec2 instances
+###
 ---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    aws_region: ap-southeast-2
+    ami_name_prefix: "RHEL-8.6.0_HVM-"
+    instance_type: t3a.micro
+    volume_size: 32
+    my_home_ipv4: 202.7.251.53/32
+    infra_group: infra
+    webservers:
+      - mini_car_game
+      - snakename
+
+  vars_files:
+    - vault.yml
+
+  environment:
+    AWS_ACCESS_KEY: '{{ vault_aws_access_key }}'
+    AWS_SECRET_KEY: '{{ vault_aws_secret_key }}'
+
+  roles:
+    - awsvpc
+
+
+  tasks:
+    - name: new keypair
+      ec2_key:
+        name: "{{ this_name }}"
+        key_material: "{{ lookup('file', ansible_ssh_public_key_file) }}"
+      no_log: true
+      register: aws_ec2_key_pair
+    
+    - name: new security group
+      ec2_group:
+        region: "{{ aws_region }}"
+        name: "{{ this_name }}"
+        state: present
+        description: ssh
+        vpc_id: "{{ newvpc.vpc.id }}"
+        rules:
+          - proto: tcp
+            ports:
+              - 22
+              - 80
+              - 443
+            cidr_ip: "{{ my_home_ipv4 }}"
+            rule_desc: http/https/ssh
+          - proto: tcp
+            ports:
+              - 22
+              - 80
+              - 443
+            cidr_ip: "163.116.215.44/32"
+            rule_desc: http/https/ssh
+          - proto: tcp
+            ports:
+              - 22
+            cidr_ip: "13.239.158.0/29"
+            rule_desc: ssh - aws connect
+        tags:
+          Name: "{{ this_name }}"
+          owner: "{{ owner }}"
+      register: ec2sg
+
+    - name: get ami id
+      ec2_ami_info:
+        aws_region: "{{ aws_region }}"
+        filters:
+          name: "{{ ami_name_prefix }}*"
+      register: ec2ami
+
+    - name: sort the list of AMIs by creation date
+      set_fact:
+        sorted_ami_list: "{{ ec2ami.images | sort(attribute='creation_date', reverse=true) }}"
+
+    - name: Use role in loop
+      include_role:
+        name: newvm
+      loop: "{{ webservers }}"
+      loop_control:
+        loop_var: this_game
+
+- name: config
+  hosts: infra
+  gather_facts: false
+  remote_user: ec2-user
+  become: yes
+
+  pre_tasks:
+    - name: install python
+      raw: dnf install -y python3.11
+
+  roles:
+    - httpd
+
+  tasks:
+    - name: Set a hostname
+      hostname:
+        name: "{{ this_game }}.{{ this_domain }}"

@@ -1,0 +1,56 @@
+---
+    - name: launch new instance - {{ this_game }}
+      ec2_instance:
+        name: "{{ this_game }}"
+        aws_region: "{{ aws_region }}"
+        vpc_subnet_id: "{{ public_subnets.results[0].subnet.id }}"
+        image_id: "{{ sorted_ami_list[0].image_id }}" 
+        key_name: "{{ this_name }}"
+        security_group: "{{ ec2sg.group_id }}"
+        instance_type: "{{ instance_type }}"
+        #user_data: "{{ lookup('file', '/tmp/userdata.sh') }}"
+        wait: true
+        wait_timeout: 60
+        volumes:
+          - device_name: /dev/xvda
+            ebs:
+              volume_size: "{{ volume_size }}"
+              delete_on_termination: true
+        termination_protection: no
+        network:
+          assign_public_ip: true
+        tags:
+          Name: "{{ this_game }}"
+          owner: "{{ owner }}"
+          #repo: "{{ repo }}"
+      register: ec2instances
+    
+    - name: ec2 instance ip - {{ this_game }}
+      set_fact:
+        ec2instance_ip: "{{ ec2instances.instances[0].public_ip_address }}"
+
+    - debug:
+        var: ec2instance_ip
+      when: debug_on | default('false') == "true"
+
+    - name: udpate cloudflare
+      cloudflare_dns:
+        zone: "{{ this_domain }}"
+        record: "{{ this_game }}"
+        type: A
+        value: "{{ ec2instance_ip }}"
+        ttl: 120
+        account_email: "{{ cloudflare_account_email }}"
+        api_token: "{{ cloudflare_api_token }}"
+        state: present
+
+    - name: in memory inventory
+      add_host:
+        name: "{{ this_game }}.{{ this_domain }}"
+        groups: 
+          - "{{ infra_group }}"
+
+    - name: wait for SSH to come up
+      wait_for:
+        host: "{{ ec2instance_ip }}"
+        port: 22

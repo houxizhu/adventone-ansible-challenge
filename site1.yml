@@ -1,0 +1,17 @@
+- name: config
+  hosts: all
+  gather_facts: false
+  remote_user: ec2-user
+  become: yes
+
+  pre_tasks:
+    - name: install python
+      raw: dnf install -y python3.11
+
+  roles:
+    - httpd
+
+  tasks:
+    - name: Set a hostname
+      hostname:
+        name: "{{ this_game }}.{{ this_domain }}"

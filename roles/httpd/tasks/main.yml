@@ -1,0 +1,46 @@
+---
+    - name: package install
+      dnf:
+        name:
+          - httpd
+          - mod_ssl
+        state: latest
+
+    - name: stop httpd service
+      service:
+        name: httpd
+        state: stopped
+
+    - name: Replace "Listen 80" with "Listen 0.0.0.0:80"
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen\s+80$'
+        replace: 'Listen 0.0.0.0:80'
+
+    - name: templating httpd conf file
+      template:
+        src: "httpd.conf.j2"
+        dest: /etc/httpd/conf.d/{{ this_name }}.conf
+
+    - name: crt file
+      copy:
+        src: ssl/httpd.crt
+        dest: "{{ httpd_ssl_cert_file }}"
+        mode: "0664"
+
+    - name: key file
+      copy:
+        src: ssl/httpd.key
+        dest: "{{ httpd_ssl_key_file }}"
+        mode: "0400"
+
+    - name: copy HTML file
+      copy:
+        src: "{{ this_game }}.html"
+        dest: /var/www/html/index.html
+        
+    - name: start service
+      service:
+        name: httpd
+        state: started
+        enabled: yes

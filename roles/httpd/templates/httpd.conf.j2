@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName {{ this_game }}.{{ this_domain }}
+    Redirect permanent / https://{{ this_game }}.{{ this_domain }}/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName {{ this_game }}.{{ this_domain }}
+    DocumentRoot /var/www/html
+
+    SSLEngine on
+    SSLCertificateFile {{ httpd_ssl_cert_file }}
+    SSLCertificateKeyFile {{ httpd_ssl_key_file }}
+</VirtualHost>
