@@ -1,0 +1,133 @@
+➜  adventone-ansible-challenge git:(master) ✗ ansible-playbook site.yml
+[WARNING]: No inventory was parsed, only implicit localhost is available
+[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+
+PLAY [This playbook deploys 2 AWS EC2 RedHat 8.6 instances] *********************************************************************************************
+
+TASK [awsvpc : New vpc] *********************************************************************************************************************************
+changed: [localhost]
+
+TASK [awsvpc : Public subnet] ***************************************************************************************************************************
+changed: [localhost] => (item=10.56.10.0/24)
+
+TASK [awsvpc : Internet gateway] ************************************************************************************************************************
+changed: [localhost]
+
+TASK [awsvpc : Route table] *****************************************************************************************************************************
+changed: [localhost]
+
+TASK [awsvpc : Debug public subnet ID] ******************************************************************************************************************
+skipping: [localhost] => (item={'changed': True, 'subnet': {'availability_zone': 'ap-southeast-2c', 'availability_zone_id': 'apse2-az2', 'available_ip_address_count': 251, 'cidr_block': '10.56.10.0/24', 'default_for_az': False, 'map_public_ip_on_launch': True, 'map_customer_owned_ip_on_launch': False, 'state': 'available', 'vpc_id': 'vpc-0d4b5a5d04a0668d7', 'owner_id': '471112672291', 'assign_ipv6_address_on_creation': False, 'ipv6_cidr_block_association_set': [], 'tags': {'Name': 'advent1', 'owner': 'Xizhu Hou'}, 'subnet_arn': 'arn:aws:ec2:ap-southeast-2:471112672291:subnet/subnet-092b45d83596ba015', 'enable_dns64': False, 'ipv6_native': False, 'private_dns_name_options_on_launch': {'hostname_type': 'ip-name', 'enable_resource_name_dns_a_record': False, 'enable_resource_name_dns_aaaa_record': False}, 'id': 'subnet-092b45d83596ba015', 'ipv6_cidr_block': '', 'ipv6_association_id': ''}, 'invocation': {'module_args': {'state': 'present', 'vpc_id': 'vpc-0d4b5a5d04a0668d7', 'cidr': '10.56.10.0/24', 'region': 'ap-southeast-2', 'map_public': True, 'tags': {'Name': 'advent1', 'owner': 'Xizhu Hou'}, 'access_key': 'AKIAW3MEA4QRZQ66FNXH', 'secret_key': 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER', 'validate_certs': True, 'debug_botocore_endpoint_logs': False, 'ipv6_cidr': '', 'outpost_arn': '', 'assign_instances_ipv6': False, 'wait': True, 'wait_timeout': 300, 'purge_tags': True, 'session_token': None, 'profile': None, 'endpoint_url': None, 'aws_ca_bundle': None, 'aws_config': None, 'az': None}}, 'failed': False, 'subnet_cidr_block': '10.56.10.0/24', 'ansible_loop_var': 'subnet_cidr_block'}) 
+skipping: [localhost]
+
+TASK [New keypair] **************************************************************************************************************************************
+changed: [localhost]
+
+TASK [Save ssh key] *************************************************************************************************************************************
+changed: [localhost]
+
+TASK [New security group] *******************************************************************************************************************************
+changed: [localhost]
+
+TASK [Get ami id] ***************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Sort the list of AMIs by creation date] ***********************************************************************************************************
+ok: [localhost]
+
+TASK [Use role in loop] *********************************************************************************************************************************
+
+TASK [newvm : Launch new instance - mini_car_game] ******************************************************************************************************
+changed: [localhost]
+
+TASK [newvm : EC2 instance ip - mini_car_game] **********************************************************************************************************
+ok: [localhost]
+
+TASK [newvm : Debug ip] *********************************************************************************************************************************
+skipping: [localhost]
+
+TASK [newvm : Udpate cloudflare] ************************************************************************************************************************
+changed: [localhost]
+
+TASK [newvm : In memory inventory] **********************************************************************************************************************
+changed: [localhost]
+
+TASK [newvm : Wait for SSH to come up] ******************************************************************************************************************
+ok: [localhost]
+
+TASK [newvm : Wait for the instance to be running] ******************************************************************************************************
+ok: [localhost]
+
+TASK [newvm : Launch new instance - snakegame] **********************************************************************************************************
+changed: [localhost]
+
+TASK [newvm : EC2 instance ip - snakegame] **************************************************************************************************************
+ok: [localhost]
+
+TASK [newvm : Debug ip] *********************************************************************************************************************************
+skipping: [localhost]
+
+TASK [newvm : Udpate cloudflare] ************************************************************************************************************************
+changed: [localhost]
+
+TASK [newvm : In memory inventory] **********************************************************************************************************************
+changed: [localhost]
+
+TASK [newvm : Wait for SSH to come up] ******************************************************************************************************************
+ok: [localhost]
+
+TASK [newvm : Wait for the instance to be running] ******************************************************************************************************
+ok: [localhost]
+
+TASK [Pause for 2 minutes] ******************************************************************************************************************************
+Pausing for 120 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [localhost]
+
+PLAY [Config] *******************************************************************************************************************************************
+
+TASK [Install python] ***********************************************************************************************************************************
+changed: [snakegame.yaml.work]
+changed: [mini_car_game.yaml.work]
+
+TASK [httpd : Package install] **************************************************************************************************************************
+changed: [snakegame.yaml.work]
+changed: [mini_car_game.yaml.work]
+
+TASK [httpd : Stop httpd service] ***********************************************************************************************************************
+ok: [mini_car_game.yaml.work]
+ok: [snakegame.yaml.work]
+
+TASK [httpd : Replace "Listen 80" with "Listen 0.0.0.0:80"] *********************************************************************************************
+changed: [snakegame.yaml.work]
+changed: [mini_car_game.yaml.work]
+
+TASK [httpd : Templating httpd conf file] ***************************************************************************************************************
+changed: [snakegame.yaml.work]
+changed: [mini_car_game.yaml.work]
+
+TASK [httpd : Crt file] *********************************************************************************************************************************
+changed: [mini_car_game.yaml.work]
+changed: [snakegame.yaml.work]
+
+TASK [httpd : Key file] *********************************************************************************************************************************
+changed: [mini_car_game.yaml.work]
+changed: [snakegame.yaml.work]
+
+TASK [httpd : Copy HTML file] ***************************************************************************************************************************
+changed: [snakegame.yaml.work]
+changed: [mini_car_game.yaml.work]
+
+TASK [httpd : Start service] ****************************************************************************************************************************
+changed: [mini_car_game.yaml.work]
+changed: [snakegame.yaml.work]
+
+TASK [Set a hostname] ***********************************************************************************************************************************
+changed: [snakegame.yaml.work]
+changed: [mini_car_game.yaml.work]
+
+PLAY RECAP **********************************************************************************************************************************************
+localhost                  : ok=22   changed=13   unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+mini_car_game.yaml.work    : ok=10   changed=9    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+snakegame.yaml.work        : ok=10   changed=9    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

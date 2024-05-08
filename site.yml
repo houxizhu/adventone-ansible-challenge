@@ -1,8 +1,6 @@
-###
-### This playbook creates 2 aws ec2 instances
-###
 ---
-- hosts: localhost
+- name: This playbook deploys 2 AWS EC2 RedHat 8.6 instances
+  hosts: localhost
   connection: local
   gather_facts: false
 
@@ -11,7 +9,7 @@
     ami_name_prefix: "RHEL-8.6.0_HVM-"
     instance_type: t3.micro
     volume_size: 32
-    my_home_ipv4: 202.7.251.53/32
+    my_home_ipv4: 0.0.0.0/0
     infra_group: infra
     webservers:
       - mini_car_game
@@ -29,15 +27,21 @@
 
 
   tasks:
-    - name: new keypair
-      ec2_key:
+    - name: New keypair
+      amazon.aws.ec2_key:
         name: "{{ this_name }}"
-        key_material: "{{ lookup('file', ansible_ssh_public_key_file) }}"
       no_log: true
       register: aws_ec2_key_pair
-    
-    - name: new security group
-      ec2_group:
+
+    - name: Save ssh key
+      ansible.builtin.copy:
+        content: "{{ aws_ec2_key_pair.key.private_key }}"
+        dest: "{{ ansible_ssh_private_key_file }}"
+        mode: "0400"
+      when: aws_ec2_key_pair.key.private_key is defined
+
+    - name: New security group
+      amazon.aws.ec2_security_group:
         region: "{{ aws_region }}"
         name: "{{ this_name }}"
         state: present
@@ -54,13 +58,6 @@
           - proto: tcp
             ports:
               - 22
-              - 80
-              - 443
-            cidr_ip: "163.116.215.44/32"
-            rule_desc: http/https/ssh
-          - proto: tcp
-            ports:
-              - 22
             cidr_ip: "13.239.158.0/29"
             rule_desc: ssh - aws connect
         tags:
@@ -69,38 +66,44 @@
           repo: "{{ repo }}"
       register: ec2sg
 
-    - name: get ami id
-      ec2_ami_info:
+    - name: Get ami id
+      amazon.aws.ec2_ami_info:
         aws_region: "{{ aws_region }}"
         filters:
           name: "{{ ami_name_prefix }}*"
       register: ec2ami
 
-    - name: sort the list of AMIs by creation date
-      set_fact:
+    - name: Sort the list of AMIs by creation date
+      ansible.builtin.set_fact:
         sorted_ami_list: "{{ ec2ami.images | sort(attribute='creation_date', reverse=true) }}"
 
     - name: Use role in loop
-      include_role:
+      ansible.builtin.include_role:
         name: newvm
       loop: "{{ webservers }}"
       loop_control:
         loop_var: this_game
 
-- name: config
+    - name: Pause for 2 minutes
+      ansible.builtin.pause:
+        minutes: 2
+
+- name: Config
   hosts: infra
   gather_facts: false
   remote_user: ec2-user
-  become: yes
+  become: true
 
   pre_tasks:
-    - name: install python
-      raw: dnf install -y python3.11
+    - name: Install python
+      ansible.builtin.raw: dnf install -y python3.11
+      register: result
+      changed_when: "'Nothing to do' not in result.stdout"
 
   roles:
     - httpd
 
   tasks:
     - name: Set a hostname
-      hostname:
+      ansible.builtin.hostname:
         name: "{{ this_game }}.{{ this_domain }}"

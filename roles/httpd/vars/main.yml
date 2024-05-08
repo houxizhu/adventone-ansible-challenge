@@ -1,3 +1,4 @@
 ---
 httpd_ssl_cert_file: /etc/pki/tls/certs/localhost.crt
 httpd_ssl_key_file: /etc/pki/tls/private/localhost.key
+httpd_version: 2.4.37

@@ -1,5 +1,5 @@
 ---
-vpc_cidr_block: "10.56.0.0/16"
-subnet_cidr_blocks:
+awsvpc_vpc_cidr_block: "10.56.0.0/16"
+awsvpc_subnet_cidr_blocks:
   - "10.56.10.0/24"
-  #- "10.56.20.0/24"
+  # - "10.56.20.0/24"

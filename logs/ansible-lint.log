@@ -1,0 +1,6 @@
+➜  adventone-ansible-challenge git:(master) ✗ date
+Wed 08 May 2024 12:49:16 AEST
+
+➜  adventone-ansible-challenge git:(master) ✗ ansible-lint site.yml
+
+Passed: 0 failure(s), 0 warning(s) on 6 files. Last profile that met the validation criteria was 'production'.

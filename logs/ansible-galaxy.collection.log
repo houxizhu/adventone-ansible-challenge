@@ -1,0 +1,8 @@
+➜  adventone-ansible-challenge git:(master) ✗ ansible-galaxy collection install -r collections/requirements.yml
+Starting galaxy collection install process
+Process install dependency map
+Starting collection install process
+Downloading https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/community-general-8.0.2.tar.gz to /home/xhou/.ansible/tmp/ansible-local-46045se64txnz/tmpg98bwqu6/community-general-8.0.2-yuy0c3um
+'amazon.aws:7.1.0' is already installed, skipping.
+Installing 'community.general:8.0.2' to '/home/xhou/.ansible/collections/ansible_collections/community/general'
+community.general:8.0.2 was installed successfully
